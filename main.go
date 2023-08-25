@@ -105,8 +105,21 @@ func updateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	port := "8080"
+	port := ":8080"
 
+	tasks = append(tasks, Task{
+		ID:          "1",
+		Title:       "Home Work",
+		Description: "Chemistry notes",
+		Status:      "To Do",
+	})
+
+	tasks = append(tasks, Task{
+		ID:          "2",
+		Title:       "Mopping",
+		Description: "Cleaning in the stores",
+		Status:      "To Do",
+	})
 	r := mux.NewRouter()
 
 	r.HandleFunc("/tasks", getTasks).Methods("GET")
@@ -115,12 +128,11 @@ func main() {
 	r.HandleFunc("/tasks/{id}", deleteTask).Methods("DELETE")
 	r.HandleFunc("/tasks/{id}", updateTask).Methods("PUT")
 
-	log.Printf("Starting server at port %v", port)
+	log.Printf("\nStarting server at port %v", port)
 
 	err := http.ListenAndServe(port, r)
 	if err != nil {
 		log.Fatalf("%v\n", err)
 		return
 	}
-
 }
