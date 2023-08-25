@@ -84,6 +84,24 @@ func createTask(w http.ResponseWriter, r *http.Request) {
 func updateTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
+	params := mux.Vars(r)
+
+	for index, task := range tasks {
+		if task.ID == params["id"] {
+			var updatedTask Task
+			_ = json.NewDecoder(r.Body).Decode(&updatedTask)
+			updatedTask.ID = params["id"]
+			tasks[index] = updatedTask
+
+			err := json.NewEncoder(w).Encode(task)
+			if err != nil {
+				log.Printf("%v\n", err)
+				return
+			}
+			return
+		}
+	}
+
 }
 
 func main() {
