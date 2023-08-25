@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/mux"
 	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
 )
 
 type Task struct {
@@ -36,21 +37,50 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 		if task.ID == params["id"] {
 			err := json.NewEncoder(w).Encode(task)
 			if err != nil {
-				fmt.Printf("%v\n", err)
+				log.Printf("%v\n", err)
 				return
 			}
 			return
 		}
 	}
 }
+
 func deleteTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
+	params := mux.Vars(r)
+
+	for index, task := range tasks {
+		if task.ID == params["id"] {
+			tasks = append(tasks[:index], tasks[index+1:]...)
+
+			err := json.NewEncoder(w).Encode(tasks)
+			if err != nil {
+				log.Printf("%v\n", err)
+				return
+			}
+			return
+		}
+	}
+
 }
+
 func createTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
+	var newTask Task
+	_ = json.NewDecoder(r.Body).Decode(&newTask)
+
+	newTask.ID = strconv.Itoa(rand.Intn(9999999999))
+	tasks = append(tasks, newTask)
+
+	err := json.NewEncoder(w).Encode(newTask)
+	if err != nil {
+		log.Printf("%v\n", err)
+		return
+	}
 }
+
 func updateTask(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("content-type", "application/json")
 
